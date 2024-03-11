@@ -18,7 +18,7 @@ jobs:
       run: |
         docker login -u "id64xepqbqwr/alexmh25@hotmail.com" -p "$OCI_AUTH_TOKEN" iad.ocir.io && \
         docker buildx create --use && \
-        docker buildx build --platform linux/amd64 -t iad.ocir.io/id64xepqbqwr/alex/terr-test --push .
+        docker buildx build --platform linux/amd64 -t iad.ocir.io/id64xepqbqwr/alex/terr-test1 --push .
       env:
         OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
 
