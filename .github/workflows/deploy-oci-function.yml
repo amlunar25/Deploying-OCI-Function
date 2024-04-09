@@ -1,0 +1,55 @@
+name: Docker and Terraform Deployment
+
+on:
+  push:
+
+jobs:
+  build_and_push_image:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and push Docker image
+      run: |
+        docker login -u "id64xepqbqwr/alexmh25@hotmail.com" -p "$OCI_AUTH_TOKEN" iad.ocir.io && \
+        docker buildx create --use && \
+        docker buildx build --platform linux/amd64 -t iad.ocir.io/id64xepqbqwr/alex/terr-test1 --push .
+      env:
+        OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push_image
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: "1.0.0"
+
+    - name: Set up OCI Config
+      run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.OCI_CONFIG }}" > ~/.oci/config
+          echo "${{ secrets.OCI_API_KEY }}" > ~/.oci/oci-local.pem
+          chmod 600 ~/.oci/config ~/.oci/oci-local.pem
+      env:
+          OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+          OCI_API_KEY: ${{ secrets.OCI_API_KEY }}
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
