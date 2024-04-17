@@ -31,17 +31,15 @@ jobs:
         echo "region = ${{ secrets.AWS_REGION }}" >> rclone.conf
         echo "acl = private" >> rclone.conf
       
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: id64xepqbqwr/alexmh25@hotmail.com
-        password: ${{ secrets.OCI_AUTH_TOKEN }}
-
+    - name: Log in to Oracle Cloud Infrastructure Registry
+      run: echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u "id64xepqbqwr/alexmh25@hotmail.com" --password-stdin iad.ocir.io
+        
     - name: Build Docker image
-      run: docker build -t terr-test:lastest .
-      
+      run: docker build -t iad.ocir.io/id64xepqbqwr/alex/terr-test:latest .
+        
     - name: Push Docker image
-      run: docker push iad.ocir.io/id64xepqbqwr/alex/terr-test:1.0
+      run: docker push iad.ocir.io/id64xepqbqwr/alex/terr-test:latest
+
     # - name: Set up Docker Buildx
     #   uses: docker/setup-buildx-action@v1
 
