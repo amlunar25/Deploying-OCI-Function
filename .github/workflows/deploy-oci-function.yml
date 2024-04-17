@@ -30,14 +30,25 @@ jobs:
         echo "secret_access_key = ${{ secrets.AWS_SECRET_KEY }}" >> rclone.conf
         echo "region = ${{ secrets.AWS_REGION }}" >> rclone.conf
         echo "acl = private" >> rclone.conf
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: id64xepqbqwr/alexmh25@hotmail.com
+        password: ${{ secrets.OCI_AUTH_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+    - name: Build Docker image
+      run: docker build -t terr-test:lastest .
+      
+    - name: Push Docker image
+      run: docker push iad.ocir.io/id64xepqbqwr/alex/terr-test:1.0
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@v1
 
-    - name: Build and push Docker image
-      run: |
-        docker login -u "id64xepqbqwr/alexmh25@hotmail.com" -p "$OCI_AUTH_TOKEN" iad.ocir.io && \
-        docker buildx create --use && \
-        docker buildx build --platform linux/amd64 -t iad.ocir.io/id64xepqbqwr/alex/terr-test --push .
-      env:
-        OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
+    # - name: Build and push Docker image
+    #   run: |
+    #     docker login -u "id64xepqbqwr/alexmh25@hotmail.com" -p "$OCI_AUTH_TOKEN" iad.ocir.io && \
+    #     docker buildx create --use && \
+    #     docker buildx build --platform linux/amd64 -t iad.ocir.io/id64xepqbqwr/alex/terr-test --push .
+    #   env:
+    #     OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
